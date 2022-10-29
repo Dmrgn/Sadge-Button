@@ -4,7 +4,7 @@
 
 <script>
 const primary = "rgb(84, 103, 169)";
-const secondary = "rgb(202,118,28)";
+const secondary = "rgb(202, 118, 28)";
 
 export default {
     name:"MainCanvas",
