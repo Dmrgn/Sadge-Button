@@ -1,0 +1,8 @@
+$primary: rgb(84, 103, 169);
+$secondary: rgb(202,118,28);
+$black: rgb(24,26,27);
+$light-black: lighten($black, 5%);
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
