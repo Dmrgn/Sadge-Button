@@ -1,6 +1,6 @@
 <template>
     <div @click="clicked" @mousemove="updateMousePos" class="wrapper">
-        <MainCanvas :mousePos="this.mousePos" />
+        <MainCanvas @received-click="receivedClick" :isClicked="this.isClicked" :mousePos="this.mousePos" />
         <div class="grid grid-cols-4 justify-evenly w-full absolute top-0">
             <div class=""></div>
             <MainMenu />
@@ -17,6 +17,7 @@
 		data() {
 			return {
 				mousePos: {x:0,y:0},
+				isClicked: false
 			}
 		},
 		components: {
@@ -29,7 +30,10 @@
 				this.mousePos.y = event.clientY;
 			},
 			clicked() {
-				
+				this.isClicked = true;
+			},
+			receivedClick() {
+				this.isClicked = false;
 			}
 		},
     }

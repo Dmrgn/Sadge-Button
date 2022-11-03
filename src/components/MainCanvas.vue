@@ -5,11 +5,25 @@
 <script>
 const primary = "rgb(84, 103, 169)";
 const secondary = "rgb(202, 118, 28)";
+const black = "rgb(24,26,27)";
+const confettiCols = [
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "blue",
+    "purple",
+    "pink",
+];
 
 export default {
     name:"MainCanvas",
     data() {
         return {
+            state: "unclicked",
+            transitionAmount: 1,
+            startedRedirect: false,
+            confetti: [],
             windowSize: {width:0, height:0},
             range: 300,
             circleWidth: 10,
@@ -31,6 +45,10 @@ export default {
             type: Object,
             default: {x:0, y:0}
         },
+        isClicked: {
+            type: Boolean,
+            default: false
+        }
     },
     mounted() {
         // start listeners
@@ -46,6 +64,17 @@ export default {
         window.removeEventListener("resize", this.handleResize);
         clearInterval(this.interval);
     },
+    watch: {
+        isClicked(newValue, oldValue) {
+            if (newValue) {
+                this.$emit("receivedClick");
+                if (this.mousePos.x > this.buttonPos.x && this.mousePos.x < this.buttonPos.x+this.buttonSize.width
+                && this.mousePos.y > this.buttonPos.y && this.mousePos.y < this.buttonPos.y+this.buttonSize.height) {
+                    this.state = "clicked";
+                }
+            }
+        }
+    },
     methods: {
         handleResize() {
             this.windowSize.width = window.innerWidth;
@@ -57,11 +86,49 @@ export default {
             this.frameCount++;
             // draw background
             this.ctx.clearRect(0, 0, this.windowSize.width, this.windowSize.height);
-            // move the button away from the mouse
-            this.moveButton();
-            // draw the sine wave
-            this.sineWave(0, 0, 1);
-            this.sineWave(0, this.windowSize.height, -1);
+
+            switch (this.state) {
+                case "unclicked":
+                    // move the button away from the mouse
+                    this.moveButton();
+                    this.drawButton();
+                    // draw the sine wave
+                    this.sineWave(0, 0, 1);
+                    this.sineWave(0, this.windowSize.height, -1);
+                    break;
+                case "clicked":
+                    // draw but don't move the button
+                    this.drawButton();
+                    // draw the sine wave
+                    this.sineWave(0, 0, 1);
+                    this.sineWave(0, this.windowSize.height, -1);
+                    // draw transition
+                    this.updateTransitionAmount();
+                    // draw the sine wave transition
+                    this.drawSineWaveTransition(0, 0, 50);
+                    this.drawSineWaveTransition(0, 0, 50, true);
+                    this.drawSineWaveTransition(0, this.windowSize.height-50, 50);
+                    this.drawSineWaveTransition(0, this.windowSize.height-50, 50, true);
+                    // draw confetti
+                    this.drawConfettiTransition();
+                    break;
+                case "transitioned":
+                    if (this.startedRedirect == false) {
+                        this.startedRedirect = true;
+                        this.redirectToHappiness();
+                    }
+                    break;
+                default:
+                    console.log("invalid state", this.state);
+                    break;
+            }
+        },
+        mapRange(n, min1, max1, min2, max2) {
+            let range1 = max1-min1;
+            let percent1 = n/range1;
+            let range2 = max2-min2;
+            let value = range2*percent1;
+            return value+min2;
         },
         moveButton() {
             // move button away from the mouse
@@ -72,17 +139,9 @@ export default {
             let total = Math.abs(difference.x) + Math.abs(difference.y);
             const unitDifference = {x:difference.x/total, y:difference.y/total};
             let distance = Math.sqrt((difference.x**2) + (difference.y**2));
-            // add wave intensity
-            function mapRange(n, min1, max1, min2, max2) {
-                let range1 = max1-min1;
-                let percent1 = n/range1;
-                let range2 = max2-min2;
-                let value = range2*percent1;
-                return value+min2;
-            }
-            this.waveIntensity += 0.01 + mapRange(Math.min(distance,500), 0, 500, 0.5, 0);
+            this.waveIntensity += 0.01 + this.mapRange(Math.min(distance,500), 0, 500, 0.5, 0);
             this.waveIntensity *= 0.8;
-            this.waveSize += 1 + mapRange(Math.min(distance,500), 0, 500, 0.5, 0) * 20;
+            this.waveSize += 1 + this.mapRange(Math.min(distance,500), 0, 500, 0.5, 0) * 20;
             this.waveSize *= 0.8;
             // add to vel
             this.buttonVel.x += unitDifference.x * Math.max(this.range-distance,0)*this.sensitivity;
@@ -117,6 +176,8 @@ export default {
             if (this.buttonPos.y < 0 && this.buttonVel.y < 0) this.buttonVel.y *= -5;
             if (this.buttonPos.x+this.buttonSize.width > this.windowSize.width && this.buttonVel.x > 0) this.buttonVel.x *= -5;
             if (this.buttonPos.y+this.buttonSize.height > this.windowSize.height && this.buttonVel.y > 0) this.buttonVel.y *= -5;
+        },
+        drawButton() {
             // draw button
             this.ctx.fillStyle= this.buttonColour;
             this.ctx.beginPath();
@@ -145,7 +206,6 @@ export default {
                     y: prev.y + (points[0].y - prev.y) + 10*inverted
                 }
                 this.ctx.bezierCurveTo(prev.x, prev.y, halfway.x, halfway.y, points[0].x, points[0].y);
-                // this.ctx.ellipse(point.x, point.y, this.circleWidth, this.circleWidth, 0, 0, 2 * Math.PI);
             }
             this.ctx.strokeStyle = secondary;
             this.ctx.stroke();
@@ -159,13 +219,52 @@ export default {
                     y: prev.y + (points[0].y - prev.y) + 10*inverted
                 }
                 this.ctx.bezierCurveTo(prev.x+4*inverted, prev.y+4*inverted, halfway.x+4*inverted, halfway.y+4*inverted, points[0].x+4*inverted, points[0].y+4*inverted);
-                // this.ctx.ellipse(point.x, point.y, this.circleWidth, this.circleWidth, 0, 0, 2 * Math.PI);
             }
             this.ctx.strokeStyle = primary;
             this.ctx.stroke();
-            // this.ctx.fill();
         },
-        onClick() {
+        updateTransitionAmount() {
+            if (this.transitionAmount > this.windowSize.width) {
+                this.state = "transitioned";
+                return;
+            }
+            this.transitionAmount += (this.windowSize.width/60)*Math.abs(Math.sin(this.mapRange(this.transitionAmount, 0, this.windowSize.width, Math.PI/8, Math.PI/2)));
+        },
+        drawSineWaveTransition(transX, transY, height, inverted) {
+            this.ctx.fillStyle = black;
+            this.ctx.fillRect(inverted ? (this.windowSize.width-this.transitionAmount)+transX : 0, transY, this.transitionAmount, height);
+            this.ctx.beginPath();
+            this.ctx.ellipse(this.transitionAmount, transY, height, height, 0, 0, 2 * Math.PI);
+            this.ctx.fill();
+        },
+        drawConfettiTransition() {
+            function createConfetti(x, y, context) {
+                return {
+                    x: x,
+                    y: y,
+                    xVel: Math.random()*context.mapRange(x, 0, context.windowSize.width, 1, -1)*10,
+                    yVel: Math.random()*-10-10,
+                    col: confettiCols[Math.floor(Math.random()*confettiCols.length)]
+                }
+            }
+            // create new confetti on each side
+            this.confetti.push(createConfetti(0, this.windowSize.height, this));
+            this.confetti.push(createConfetti(this.windowSize.width, this.windowSize.height, this));
+            // update existing confetti
+            this.confetti.forEach((item, i)=>{
+                // update position
+                item.x += item.xVel;
+                item.y += item.yVel;
+                item.yVel += 0.5;
+                // draw
+                this.ctx.beginPath();
+                this.ctx.fillStyle = item.col;
+                this.ctx.ellipse(item.x, item.y, 10, 10, 0, 0, 2 * Math.PI);
+                this.ctx.fill();
+            });
+        },
+        redirectToHappiness() {
+
             window.location.href = "https://www.amazon.ca/Duck-Tape-Brand-241818-Unicorns/dp/B099P413C2/ref=sr_1_1?crid=2ZODFF4N32WKC&keywords=unicorn+duck+tape+%3A%29&qid=1666964933&sprefix=unicorn+duck+tape+%2Caps%2C104&sr=8-1"
         }
     },

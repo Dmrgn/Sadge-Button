@@ -1,5 +1,5 @@
 <template>
-    <div class="middle col-span-2 select-none">
+    <div class="middle col-span-2 select-none relative">
         <div class="box select-none">
             Click the button below to achieve happiness.
         </div>
