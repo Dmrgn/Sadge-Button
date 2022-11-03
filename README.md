@@ -6,5 +6,4 @@ Based on the viral TikTok
 
 [sadge.danielmorgan.xyz](https://sadge.danielmorgan.xyz)
 
-Good luck! ;)
-\- and yes it is very muchly possible
+Good luck! ;) and yes it is very muchly possible
