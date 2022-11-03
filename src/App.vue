@@ -7,9 +7,33 @@
             <div class="hidden md:block"></div>
         </div>
     </div>
+	<div class="footer">
+		<div class="mx-2">
+			{{this.splash}}
+		</div>
+		<div class="mx-2">
+			<a href="https://github.com/dmrgn/SadgeButton">
+				<img src="https://img.icons8.com/ios-glyphs/30/000000/github.png"/>
+			</a>
+		</div>
+	</div>
 </template>
 
 <script>
+	const splashes = [
+		"Made with ♥ ->",
+		"The button winks ;)",
+		"Yes its possible",
+		"('-')",
+		"I believe in you!",
+		"Keep going!",
+		"Click faster!",
+		";-; sadge",
+		":pittypat:",
+		"Ⓐ for effort!",
+		"Time flies, even when you're crying."
+	];
+
     import MainMenu from "./components/MainMenu.vue"
     import MainCanvas from "./components/MainCanvas.vue"
     export default {
@@ -17,7 +41,8 @@
 		data() {
 			return {
 				mousePos: {x:0,y:0},
-				isClicked: false
+				isClicked: false,
+				splash: splashes[Math.floor(Math.random()*splashes.length)]
 			}
 		},
 		components: {
@@ -47,5 +72,9 @@
 	}
 	.wrapper {
 		background-color: $black;
+	}
+	.footer {
+		@apply absolute flex justify-center w-full text-white;
+		top: 93%;
 	}
 </style>

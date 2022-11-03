@@ -15,6 +15,12 @@ const confettiCols = [
     "purple",
     "pink",
 ];
+// dont spoil it for yourself smh >:|
+const links = [
+    "https://www.amazon.ca/Duck-Tape-Brand-241818-Unicorns/dp/B099P413C2/ref=sr_1_1?crid=2ZODFF4N32WKC&keywords=unicorn+duck+tape+%3A%29&qid=1666964933&sprefix=unicorn+duck+tape+%2Caps%2C104&sr=8-1",
+    "https://www.google.ca/search?q=cats&sxsrf=ALiCzsbb80XzgDtjewvVMWgvZn7mxIYp8Q:1667441121824&source=lnms&tbm=isch&sa=X&ved=2ahUKEwii4f-d9pD7AhVarYkEHVlIBJUQ_AUoAXoECAEQAw&biw=2560&bih=1239&dpr=1",
+    "https://youtu.be/y5OXoEtcen8?t=25",
+];
 
 export default {
     name:"MainCanvas",
@@ -264,8 +270,7 @@ export default {
             });
         },
         redirectToHappiness() {
-
-            window.location.href = "https://www.amazon.ca/Duck-Tape-Brand-241818-Unicorns/dp/B099P413C2/ref=sr_1_1?crid=2ZODFF4N32WKC&keywords=unicorn+duck+tape+%3A%29&qid=1666964933&sprefix=unicorn+duck+tape+%2Caps%2C104&sr=8-1"
+            window.location.href = links[Math.floor(Math.random()*links.length)];
         }
     },
 }
