@@ -1,8 +1,10 @@
 # Run Away Button
 
-Made with vue although it probably could have been made without a framework as I mostly used the canvas.
+Made with vue although it probably could have been made without a framework as it mostly uses the canvas.
+
+Based on the viral TikTok
 
 [sadge.danielmorgan.xyz](https://sadge.danielmorgan.xyz)
 
 Good luck! ;)
-- and yes it is possible
+- and yes it is very muchlt possible
