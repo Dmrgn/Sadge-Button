@@ -1,7 +1,7 @@
 <template>
     <div class="middle col-span-2 select-none relative">
         <div class="box select-none">
-            Click the button below to achieve happiness.
+            {{message}}
         </div>
     </div>
 </template>
@@ -9,6 +9,22 @@
 <script>
 export default {
     name: "MainMenu",
+    data() {
+        return {
+            message: "Click the button below to achieve happiness."
+        }
+    },
+    props: {
+        hasTouched: {
+            type: Boolean,
+            default: false
+        },
+    },
+    watch: {
+        hasTouched(newValue, oldValue) {
+            if (newValue) this.message = "Hmmm... Touch screen is kinda cheating. You wouldn't want to cheat happiness would you?";
+        }
+    },
 }
 </script>
 

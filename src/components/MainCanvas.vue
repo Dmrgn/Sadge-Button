@@ -86,7 +86,10 @@ export default {
             this.windowSize.width = window.innerWidth;
             this.windowSize.height = window.innerHeight;
             this.buttonOrigin.x = this.windowSize.width/4;
-            this.buttonOrigin.y = this.windowSize.height/3 + 125;
+            if (this.windowSize.width > this.windowSize.height)
+                this.buttonOrigin.y = this.windowSize.height/3 + 125;
+            else
+                this.buttonOrigin.y = this.windowSize.height/2 + 125;
         },
         interval() {
             this.frameCount++;

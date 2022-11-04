@@ -1,9 +1,9 @@
 <template>
-    <div @click="clicked" @mousemove="updateMousePos" class="wrapper">
+    <div @click="clicked" @touchstart="touch" @touchend="untouch" @touchcancel="untouch" @mousemove="updateMousePos" class="wrapper">
         <MainCanvas @received-click="receivedClick" :isClicked="this.isClicked" :mousePos="this.mousePos" />
         <div class="grid grid-cols-4 justify-evenly w-full absolute top-0">
             <div class=""></div>
-            <MainMenu />
+            <MainMenu :hasTouched="this.hasTouched" />
             <div class="hidden md:block"></div>
         </div>
     </div>
@@ -31,7 +31,8 @@
 		";-; sadge",
 		":pittypat:",
 		"Ⓐ for effort!",
-		"Time flies, even when you're crying."
+		"Time flies, even when you're crying.",
+		"Touchscreen is cringey anyways."
 	];
 
     import MainMenu from "./components/MainMenu.vue"
@@ -42,7 +43,9 @@
 			return {
 				mousePos: {x:0,y:0},
 				isClicked: false,
-				splash: splashes[Math.floor(Math.random()*splashes.length)]
+				splash: splashes[Math.floor(Math.random()*splashes.length)],
+				touched: false,
+				hasTouched: false,
 			}
 		},
 		components: {
@@ -54,11 +57,23 @@
 				this.mousePos.x = event.clientX;
 				this.mousePos.y = event.clientY;
 			},
-			clicked() {
-				this.isClicked = true;
+			clicked(e) {
+				if (!this.touched)
+					this.isClicked = true;
+				console.log(e.type);
 			},
 			receivedClick() {
 				this.isClicked = false;
+			},
+			touch(e) {
+				this.touched = true;
+				this.hasTouched = true;
+			},
+			untouch(e) {
+				setTimeout(()=>{
+					this.touched = false;
+					console.log(e.type);
+				}, 100);
 			}
 		},
     }
